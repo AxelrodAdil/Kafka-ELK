@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    password: temp_Orange100
+    jdbc-url: jdbc:postgresql://localhost:5432/kafkaelk
+    username: postgres
+    driver-class-name: org.postgresql.Driver
+    schema: kafka_elk_stage
