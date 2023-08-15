@@ -2,6 +2,7 @@ package kz.axelrod.kafkaelk.api.repository.impl;
 
 public enum SearchOperation {
 
+    JOIN_THAN_EQUAL,
     GREATER_THAN,
     GREATER_THAN_EQUAL,
     LESS_THAN,

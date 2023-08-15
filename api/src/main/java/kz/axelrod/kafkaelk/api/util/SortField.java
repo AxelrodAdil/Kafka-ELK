@@ -1,4 +1,4 @@
-package kz.axelrod.kafkaelk.api.dto;
+package kz.axelrod.kafkaelk.api.util;
 
 import io.swagger.v3.oas.annotations.Hidden;
 

@@ -1,16 +1,14 @@
 package kz.axelrod.kafkaelk.api.repository.impl;
 
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import kz.axelrod.kafkaelk.api.dto.SearchObject;
 import lombok.Data;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public abstract class GenericSpecification<T> implements Specification<T> {
@@ -26,6 +24,15 @@ public abstract class GenericSpecification<T> implements Specification<T> {
         List<Predicate> predicates = new ArrayList<>();
         for (SearchObject criteria : list) {
             switch (criteria.getOperation()) {
+                case JOIN_THAN_EQUAL -> {
+                    Join<Object, Object> join = null;
+                    for (var tableName : criteria.getJoinTableNameList()) {
+                        join = Objects.requireNonNullElse(join, root).join(tableName, JoinType.INNER);
+                    }
+                    if (join != null) {
+                        predicates.add(criteriaBuilder.equal(join.get(criteria.getKey()), criteria.getValue().toString()));
+                    }
+                }
                 case GREATER_THAN ->
                         predicates.add(criteriaBuilder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString()));
                 case LESS_THAN ->
@@ -37,12 +44,13 @@ public abstract class GenericSpecification<T> implements Specification<T> {
                 case NOT_EQUAL ->
                         predicates.add(criteriaBuilder.notEqual(root.get(criteria.getKey()), criteria.getValue()));
                 case EQUAL -> predicates.add(criteriaBuilder.equal(root.get(criteria.getKey()), criteria.getValue()));
-                case LIKE ->
-                        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(criteria.getKey())), "%" + criteria.getValue().toString().toLowerCase() + "%"));
-                case LIKE_END ->
-                        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(criteria.getKey())), criteria.getValue().toString().toLowerCase() + "%"));
+                case LIKE -> predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(criteria.getKey())),
+                        "%" + criteria.getValue().toString().toLowerCase() + "%"));
+                case LIKE_END -> predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(criteria.getKey())),
+                        criteria.getValue().toString().toLowerCase() + "%"));
                 case LIKE_START ->
-                        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(criteria.getKey())), "%" + criteria.getValue().toString().toLowerCase()));
+                        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(criteria.getKey())),
+                                "%" + criteria.getValue().toString().toLowerCase()));
                 case IN -> predicates.add(criteriaBuilder.in(root.get(criteria.getKey())).value(criteria.getValue()));
                 case NOT_IN -> predicates.add(criteriaBuilder.not(root.get(criteria.getKey())).in(criteria.getValue()));
             }

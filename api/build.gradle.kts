@@ -17,6 +17,7 @@ tasks.bootJar {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.6")
 	implementation("org.flywaydb:flyway-core")
@@ -26,6 +27,7 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.mockito:mockito-core:4.6.1")
 }
 
 tasks.withType<Test> {
